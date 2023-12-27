@@ -54,7 +54,8 @@ axarr[0].plot(pitch_times, pitch_values)
 axarr[0].set_title('estimated pitch [Hz]')
 axarr[1].plot(pitch_times, pitch_confidence)
 axarr[1].set_title('pitch confidence')
-plt.show()
+#plt.show() 
+plt.savefig('./results.png')
 
 """
 The zero pitch value correspond to unvoiced audio segments with a very low pitch 
