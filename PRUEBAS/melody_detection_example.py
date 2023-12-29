@@ -17,7 +17,9 @@ import numpy
 
 import essentia.standard as es
 
-audiofile = './pruebasAudio/timeWasMelo160bpm.wav'
+#audiofile = './pruebasAudio/timeWasMelo160bpm.wav'
+#audiofile = './pruebasAudio/GoodbyePorkPieHat60bpm.wav'
+audiofile = './pruebasAudio/turnaround120bpm.wav'
 
 # Load audio file.
 # It is recommended to apply equal-loudness filter for PredominantPitchMelodia.
@@ -55,7 +57,9 @@ axarr[0].set_title('estimated pitch [Hz]')
 axarr[1].plot(pitch_times, pitch_confidence)
 axarr[1].set_title('pitch confidence')
 #plt.show() 
-plt.savefig('./results.png')
+#plt.savefig('./timeWasMelo160bpm_results.png')
+#plt.savefig('./GoodbyePorkPieHat60bpm_results.png')
+plt.savefig('./turnaround120bpm_results.png')
 
 """
 The zero pitch value correspond to unvoiced audio segments with a very low pitch 
@@ -78,9 +82,13 @@ temp_dir = TemporaryDirectory()
 
 # Essentia operates with float32 ndarrays instead of float64, so let's cast it.
 synthesized_melody = pitch_contour(pitch_times, pitch_values, 44100).astype(numpy.float32)[:len(audio)]
-es.AudioWriter(filename=temp_dir.name + 'timeWasMelo160bpm_melody.wav', format='wav')(es.StereoMuxer()(audio, synthesized_melody))
-
-IPython.display.Audio(temp_dir.name + 'timeWasMelo160bpm_melody.wav') 
+#es.AudioWriter(filename='./timeWasMelo160bpm_melody.wav', format='wav')(es.StereoMuxer()(audio, synthesized_melody))
+#es.AudioWriter(filename='./GoodbyePorkPieHat60bpm_melody.wav', format='wav')(es.StereoMuxer()(audio, synthesized_melody))
+es.AudioWriter(filename='./turnaround120bpm_melody.wav', format='wav')(es.StereoMuxer()(audio, synthesized_melody))
+#temp_dir.name + 
+#IPython.display.Audio('./timeWasMelo160bpm_melody.wav') 
+#IPython.display.Audio('./GoodbyePorkPieHat60bpm_melody.wav')
+IPython.display.Audio('./turnaround120bpm_melody.wav')
 # guay, pero porque me lo guarda en una carpeta random???
 
 
@@ -105,7 +113,7 @@ You can test the result using the generated .mid file in a DAW.
 
 import mido
 
-# PPQ BPM???
+# PPQ BPM??? 96 n 120
 PPQ = 96 # Pulses per quarter note.
 BPM = 120 # Assuming a default tempo in Ableton to build a MIDI clip.
 tempo = mido.bpm2tempo(BPM) # Microseconds per beat.
@@ -124,7 +132,9 @@ for note, onset, duration, silence_duration in zip(list(notes), list(onsets), li
                               time=int(mido.second2tick(duration, PPQ, tempo))))
     track.append(mido.Message('note_off', note=int(note),
                               time=int(mido.second2tick(silence_duration, PPQ, tempo))))
-
-midi_file = temp_dir.name + '/extracted_melody.mid'
+#temp_dir.name + 
+#midi_file = './timeWasMelo160bpm'+str(PPQ)+str(BPM)+'extracted_melody.mid'
+#midi_file = './GoodbyePorkPieHat60bpm'+str(PPQ)+str(BPM)+'extracted_melody.mid'
+midi_file = './turnaround120bpm'+str(PPQ)+str(BPM)+'extracted_melody.mid'
 mid.save(midi_file)
 print("MIDI file location:", midi_file)
