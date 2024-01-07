@@ -1,105 +1,92 @@
-# esto será el utils
-
-# pruebas (CREPE n AudioLoader)
-
-from pylab import plot, show, figure, imshow
-import matplotlib.pyplot as plt
-plt.rcParams['figure.figsize'] = (15, 6)
-
-import numpy as np
+import os
 import essentia.standard as es
 import essentia as ES
-import sys, csv
-import os
+from pylab import plot
+import matplotlib.pyplot as plt
+import numpy as np
 
-audiofile = './Audio/LEVEL1/WAV/StaccatoF.wav'
+def list_audiofile_names(level):
+    audiofile_names = []    
+    for file in os.listdir('./Audio/LEVEL'+str(level)+'/WAV'):
+        audiofile_names.append(file[:-4])
+    return audiofile_names
 
-loader = es.EqloudLoader(filename=audiofile, sampleRate=44100)
+def list_audiofiles(audiofile_names, level):
+    audiofiles = []
+    for i in audiofile_names:
+        audiofile = './Audio/LEVEL'+str(level)+'/WAV/'+i+'.wav'
+        audiofiles.append(audiofile)  
+    return audiofiles
 
-audio = loader()
+def YinComputation(audio, frameSize, hopSize, pitch_extractor):
+    pitch_values = []
+    pitch_confidence = []
+    for frame in es.FrameGenerator(audio, frameSize=frameSize, hopSize=hopSize, startFromZero=True):
+        frequency, confidence = pitch_extractor(frame)
+        pitch_values.append(frequency)
+        pitch_confidence.append(confidence)
+        
+    pitch_values = ES.array(pitch_values).T
+    pitch_confidence = ES.array(pitch_confidence).T
+    pitch_times = np.linspace(0.0,len(audio)/44100.0,len(pitch_values))
+    return pitch_values, pitch_confidence, pitch_times
 
-print("Duration of StaccatoF [sec]:")
-print(len(audio)/float(44100))
+def YinFFTComputation(audio, frameSize, hopSize, pitch_extractor, w, spectrum):
+    pitch_values = []
+    pitch_confidence = []
+    for frame in es.FrameGenerator(audio, frameSize=frameSize, hopSize=hopSize, startFromZero=True):
+        frequency, confidence = pitch_extractor(spectrum(w(frame)))
+        pitch_values.append(frequency)
+        pitch_confidence.append(confidence)
+        
+    pitch_values = ES.array(pitch_values).T
+    pitch_confidence = ES.array(pitch_confidence).T
+    pitch_times = np.linspace(0.0,len(audio)/44100.0,len(pitch_values))
+    return pitch_values, pitch_confidence, pitch_times
 
-#print(max(audio))
-#print(min(audio))
-"""
-plot(audio[0*44100:int(len(audio)/float(44100))*44100])
-plt.title("This is how StaccatoF looks like:")
-plt.savefig('./StaccatoF.png')
-"""
-w = es.Windowing(type = 'hann')
-spectrum = es.Spectrum()  # FFT() would return the complex FFT, here we just want the magnitude spectrum
+def askAboutCREPE():
+    print("Select PitchCREPE's Graph:")
+    print('---- 1. Tiny')
+    print('---- 2. Small')
+    print('---- 3. Medium')
+    print('---- 4. Large')
+    print('---- 5. Full')
+    graph = int(input())
+    return graph
 
-pitch_values = []
-pitch_confidence = []
-frameSize = 2048
-hopSize = 128
-pitch_extractor = es.PitchYin(frameSize=2048, sampleRate=44100)
-for frame in es.FrameGenerator(audio, frameSize=2048, hopSize=128, startFromZero=True):
-    frequency, confidence = pitch_extractor(frame) # YINfft coge el spectrum como input OJO CUIDAO
-    pitch_values.append(frequency)
-    pitch_confidence.append(confidence)
+def decideGraphCREPE(graph, hopSize):
+    if (graph == 1):
+        str_algorithm = 'PitchCREPEtiny'
+        pitch_extractor = es.PitchCREPE(graphFilename="./CREPE/crepe-tiny-1.pb", hopSize=hopSize)
+    elif (graph == 2):
+        str_algorithm = 'PitchCREPEsmall'
+        pitch_extractor = es.PitchCREPE(graphFilename="./CREPE/crepe-small-1.pb", hopSize=hopSize)
+    elif (graph == 3):
+        str_algorithm = 'PitchCREPEmedium'
+        pitch_extractor = es.PitchCREPE(graphFilename="./CREPE/crepe-medium-1.pb", hopSize=hopSize)
+    elif (graph == 4):
+        str_algorithm = 'PitchCREPElarge'
+        pitch_extractor = es.PitchCREPE(graphFilename="./CREPE/crepe-large-1.pb", hopSize=hopSize)
+    else:
+        str_algorithm = 'PitchCREPEfull'
+        pitch_extractor = es.PitchCREPE(graphFilename="./CREPE/crepe-full-1.pb", hopSize=hopSize)
+        
+    return str_algorithm, pitch_extractor
 
-print('len(pitch_values)')
-print(len(pitch_values))
-print(max(pitch_values))
-print(min(pitch_values))
-#print(pitch_values)
-print('len(pitch_confidence)')
-print(len(pitch_confidence))
-print(max(pitch_confidence))
-print(min(pitch_confidence))
-#print(pitch_confidence)
+def mkdirResults(level, str_algorithm, str_loader, sampleRate, frameSize, hopSize):
+    path = './RESULTS/LEVEL'+str(level)+str_algorithm+str_loader+'_'+str(sampleRate)+'_'+str(frameSize)+'_'+str(hopSize)
+    os.mkdir(path)
+    return path
 
-# transpose to have it in a better shape
-# we need to convert the list to an essentia.array first (== numpy.array of floats)
-pitch_values = ES.array(pitch_values).T
-pitch_confidence = ES.array(pitch_confidence).T
-print('DESPUES')
-print('len(pitch_values)')
-print(len(pitch_values))
-print(max(pitch_values))
-print(min(pitch_values))
-#print(pitch_values)
-print('len(pitch_confidence)')
-print(len(pitch_confidence))
-print(max(pitch_confidence))
-print(min(pitch_confidence))
-#print(pitch_confidence)
+def plotAudio(audio, sampleRate, path, audioName):
+    plot(audio[0*sampleRate:int(len(audio)/float(sampleRate))*sampleRate])
+    plt.title("This is how "+audioName+" looks like:")
+    plt.savefig(str(path)+'/'+audioName+'.png')
 
-# Pitch is estimated on frames. Compute frame time positions.
-pitch_times = np.linspace(0.0,len(audio)/44100.0,len(pitch_values)) # está en segundos
-
-# Plot the estimated pitch contour and confidence over time.
-f, axarr = plt.subplots(2, sharex=True)
-axarr[0].plot(pitch_times, pitch_values)
-axarr[0].set_title('estimated pitch [Hz]')
-axarr[1].plot(pitch_times, pitch_confidence)
-axarr[1].set_title('pitch confidence')
-plt.savefig('./pruebaYin.png')
-
-"""
-pitch_values = []
-pitch_confidence = []
-frameSize = 2048
-hopSize = 128
-pitch_extractor = es.PitchYinFFT(frameSize=2048, sampleRate=44100)
-
-for fstart in range(0, len(audio)-frameSize, hopSize):
-    frame = audio[fstart:fstart+frameSize]
-    frequency, confidence = pitch_extractor(frame)
-    pitch_values.append(frequency)
-    pitch_confidence.append(confidence)
-
-print('len(pitch_values)')
-print(len(pitch_values))
-print(pitch_values)
-print(max(pitch_values))
-print(min(pitch_values))
-print('len(pitch_confidence)')
-print(len(pitch_confidence))
-print(pitch_confidence)
-print(max(pitch_confidence))
-print(min(pitch_confidence))
-"""
+def plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audioName):
+    f, axarr = plt.subplots(2, sharex=True)
+    axarr[0].plot(pitch_times, pitch_values)
+    axarr[0].set_title('estimated pitch [Hz]')
+    axarr[1].plot(pitch_times, pitch_confidence)
+    axarr[1].set_title('pitch confidence')
+    plt.savefig(str(path)+'/'+audioName+'_estimatedPitch.png')
