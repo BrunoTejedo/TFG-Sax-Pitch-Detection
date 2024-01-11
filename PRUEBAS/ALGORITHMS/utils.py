@@ -5,6 +5,20 @@ from pylab import plot
 import matplotlib.pyplot as plt
 import numpy as np
 
+def save_values_csv(path, audioName, array):
+    np.savetxt(str(path)+'/values/'+audioName+'_values.csv', array)
+    
+def save_confidence_csv(path, audioName, array):
+    np.savetxt(str(path)+'/confidence/'+audioName+'_confidence.csv', array)
+
+def save_times_csv(path, audioName, array):
+    np.savetxt(str(path)+'/times/'+audioName+'_times.csv', array)
+    
+def save_all_csv(path, audioName, array1, array2, array3):
+    save_values_csv(path, audioName, array1)
+    save_confidence_csv(path, audioName, array2)
+    save_times_csv(path, audioName, array3)
+
 def list_audiofile_names(level):
     audiofile_names = []    
     for file in os.listdir('./Audio/LEVEL'+str(level)+'/WAV'):
@@ -76,12 +90,17 @@ def decideGraphCREPE(graph, hopSize):
 def mkdirResults(level, str_algorithm, str_loader, sampleRate, frameSize, hopSize):
     path = './RESULTS/LEVEL'+str(level)+str_algorithm+str_loader+'_'+str(sampleRate)+'_'+str(frameSize)+'_'+str(hopSize)
     os.mkdir(path)
+    os.mkdir(path+'/pitchplots')
+    os.mkdir(path+'/audioplots')
+    os.mkdir(path+'/values')
+    os.mkdir(path+'/confidence')
+    os.mkdir(path+'/times')
     return path
 
 def plotAudio(audio, sampleRate, path, audioName):
     plot(audio[0*sampleRate:int(len(audio)/float(sampleRate))*sampleRate])
     plt.title("This is how "+audioName+" looks like:")
-    plt.savefig(str(path)+'/'+audioName+'.png')
+    plt.savefig(str(path)+'/audioplots/'+audioName+'.png')
 
 def plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audioName):
     f, axarr = plt.subplots(2, sharex=True)
@@ -89,4 +108,4 @@ def plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audi
     axarr[0].set_title('estimated pitch [Hz]')
     axarr[1].plot(pitch_times, pitch_confidence)
     axarr[1].set_title('pitch confidence')
-    plt.savefig(str(path)+'/'+audioName+'_estimatedPitch.png')
+    plt.savefig(str(path)+'/pitchplots/'+audioName+'_estimatedPitch.png')

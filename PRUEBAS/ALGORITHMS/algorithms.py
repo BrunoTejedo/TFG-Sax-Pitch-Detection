@@ -7,8 +7,14 @@ I want to use these 3 algorithms:
 
 """
 
+# areglar los plots estaría bien
+
 # algo pasa con el caso AudioLoader: TypeError: Error cannot convert argument MATRIX_REAL to VECTOR_REAL
 # pitch_values, pitch_confidence, pitch_times = utils.YinComputation(audio, frameSize, hopSize, pitch_extractor)
+
+# pitchYinFFT falla con algunos audios ¿? el error es curioso:
+# RuntimeError: In PitchYinFFT.compute: PitchYinFFT: it appears that no peaks were found by PeakDetection. 
+# If you read this message, PLEASE, report this issue to the developers with an example of audio on which it happened.
 import utils
 import essentia.standard as es
 import sys
@@ -71,6 +77,7 @@ if (algorithm == 1):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinComputation(audio, frameSize, hopSize, pitch_extractor)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -84,6 +91,7 @@ if (algorithm == 1):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinComputation(audio, frameSize, hopSize, pitch_extractor)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -97,6 +105,7 @@ if (algorithm == 1):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinComputation(audio, frameSize, hopSize, pitch_extractor)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -112,6 +121,7 @@ if (algorithm == 1):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinComputation(audio, frameSize, hopSize, pitch_extractor)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -132,6 +142,7 @@ elif (algorithm == 2):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinFFTComputation(audio, frameSize, hopSize, pitch_extractor, w, spectrum)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -145,6 +156,7 @@ elif (algorithm == 2):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinFFTComputation(audio, frameSize, hopSize, pitch_extractor, w, spectrum)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -158,6 +170,7 @@ elif (algorithm == 2):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinFFTComputation(audio, frameSize, hopSize, pitch_extractor, w, spectrum)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -173,6 +186,7 @@ elif (algorithm == 2):
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_values, pitch_confidence, pitch_times = utils.YinFFTComputation(audio, frameSize, hopSize, pitch_extractor, w, spectrum)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -192,6 +206,7 @@ else:
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_times, pitch_values, pitch_confidence, pitch_activations = pitch_extractor(audio)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -205,6 +220,7 @@ else:
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_times, pitch_values, pitch_confidence, pitch_activations = pitch_extractor(audio)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
@@ -218,6 +234,7 @@ else:
             print("Duration of the audio sample [sec]:")
             print(len(audio)/float(sampleRate))
             pitch_times, pitch_values, pitch_confidence, pitch_activations = pitch_extractor(audio)
+            utils.save_all_csv(path, audiofile_names[j], pitch_values, pitch_confidence, pitch_times)
             utils.plotAudio(audio, sampleRate, path, audiofile_names[j])
             utils.plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audiofile_names[j])
             j=j+1
