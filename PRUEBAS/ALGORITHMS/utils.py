@@ -18,6 +18,11 @@ def save_all_csv(path, audioName, array1, array2, array3):
     save_values_csv(path, audioName, array1)
     save_confidence_csv(path, audioName, array2)
     save_times_csv(path, audioName, array3)
+    
+def save_midi_csv(path, audioName, notes, onsets, durations):
+    np.savetxt(str(path)+'/midi/'+audioName+'_estimated__midinotes.csv', notes)
+    np.savetxt(str(path)+'/midi/'+audioName+'_estimated_midionsets.csv', onsets)
+    np.savetxt(str(path)+'/midi/'+audioName+'_estimated_mididurations.csv', durations)
 
 def list_audiofile_names(level):
     audiofile_names = []    
@@ -95,6 +100,7 @@ def mkdirResults(level, str_algorithm, str_loader, sampleRate, frameSize, hopSiz
     os.mkdir(path+'/values')
     os.mkdir(path+'/confidence')
     os.mkdir(path+'/times')
+    os.mkdir(path+'/midi')
     return path
 
 def plotAudio(audio, sampleRate, path, audioName):
@@ -109,3 +115,30 @@ def plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audi
     axarr[1].plot(pitch_times, pitch_confidence)
     axarr[1].set_title('pitch confidence')
     plt.savefig(str(path)+'/pitchplots/'+audioName+'_estimatedPitch.png')
+    
+def convert_timestamps(pitch_times, pitch_values, notes, onsets, durations):
+    offsets = onsets + durations # finales de notas
+    ref_times = pitch_times
+    ref_values = np.zeros(len(ref_times))
+    j=0
+    for i in ref_times:
+        if (i >= onsets[0]):
+            if (i < offsets[0]):
+                ref_values[j] = notes[0]
+            else:
+                # comprobar que no haya notas seguidas
+                if (len(onsets) > 1):
+                    if (i >= onsets[1]) and (i < offsets[1]):
+                        ref_values[j] = notes[1]
+                        offsets = np.delete(offsets, 0)
+                        onsets = np.delete(onsets, 0)
+                        notes = np.delete(notes, 0)
+                    else:
+                        offsets = np.delete(offsets, 0)
+                        onsets = np.delete(onsets, 0)
+                        notes = np.delete(notes, 0)
+                
+        j=j+1
+    return ref_times, ref_values
+    
+    
