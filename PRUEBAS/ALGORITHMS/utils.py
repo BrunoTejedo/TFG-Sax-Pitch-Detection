@@ -4,6 +4,7 @@ import essentia as ES
 from pylab import plot
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 
 def save_values_csv(path, audioName, array):
     np.savetxt(str(path)+'/values/'+audioName+'_values.csv', array)
@@ -117,7 +118,7 @@ def plot_estimated_pitch(pitch_times, pitch_values, pitch_confidence, path, audi
     plt.savefig(str(path)+'/pitchplots/'+audioName+'_estimatedPitch.png')
     
 def convert_timestamps(pitch_times, pitch_values, notes, onsets, durations):
-    offsets = onsets + durations # finales de notas
+    offsets = onsets + durations # notes endings
     ref_times = pitch_times
     ref_values = np.zeros(len(ref_times))
     j=0
@@ -126,7 +127,7 @@ def convert_timestamps(pitch_times, pitch_values, notes, onsets, durations):
             if (i < offsets[0]):
                 ref_values[j] = notes[0]
             else:
-                # comprobar que no haya notas seguidas
+                # check that there are no consecutive notes
                 if (len(onsets) > 1):
                     if (i >= onsets[1]) and (i < offsets[1]):
                         ref_values[j] = notes[1]
@@ -140,5 +141,17 @@ def convert_timestamps(pitch_times, pitch_values, notes, onsets, durations):
                 
         j=j+1
     return ref_times, ref_values
+
+def extract_csv(path):
+    with open(path, 'r') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+        
+    data_array = np.array(data)
+    data_array = np.array(data, dtype=float)
+    data_array = np.transpose(data_array)
+    return data_array[0]
     
+def save_metrics_csv(path, array):
+    np.savetxt(str(path), array)
     

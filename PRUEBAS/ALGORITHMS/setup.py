@@ -23,7 +23,7 @@ for file in os.listdir('./Audio/LEVEL1/MID'):
         else:
             durations.append(time)
     notes = librosa.midi_to_hz(notes) # Midi notes to Hz
-    tempo = mido.bpm2tempo(120) # suponemos siempre que BPM=120
+    tempo = mido.bpm2tempo(120) # we assume that BPM=120
     onsets = np.array(onsets)
     durations = np.array(durations)
     onsets = mido.tick2second(onsets,mid.ticks_per_beat,tempo)
@@ -49,7 +49,7 @@ for file in os.listdir('./Audio/LEVEL2/MID'):
         else:
             durations.append(time)
     notes = librosa.midi_to_hz(notes) # Midi notes to Hz
-    tempo = mido.bpm2tempo(120) # suponemos siempre que BPM=120
+    tempo = mido.bpm2tempo(120) # we assume that BPM=120
     onsets = np.array(onsets)
     durations = np.array(durations)
     onsets = mido.tick2second(onsets,mid.ticks_per_beat,tempo)
@@ -76,7 +76,7 @@ for file in os.listdir('./Audio/LEVEL3/MID'):
         else:
             durations.append(time)
     notes = librosa.midi_to_hz(notes) # Midi notes to Hz
-    tempo = mido.bpm2tempo(120) # suponemos siempre que BPM=120
+    tempo = mido.bpm2tempo(120) # we assume that BPM=120
     onsets = np.array(onsets)
     durations = np.array(durations)
     onsets = mido.tick2second(onsets,mid.ticks_per_beat,tempo)
