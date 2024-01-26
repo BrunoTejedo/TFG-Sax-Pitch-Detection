@@ -154,4 +154,3 @@ def extract_csv(path):
     
 def save_metrics_csv(path, array):
     np.savetxt(str(path), array)
-    

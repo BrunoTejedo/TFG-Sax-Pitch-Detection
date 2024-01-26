@@ -11,11 +11,42 @@ for folder in os.listdir('./RESULTS'):
     #os.rmdir(path+'/metrics')
     shutil.rmtree(path+'/metrics')
 
+VFA_level1 = []
+VFA_level2 = []
+VFA_level3 = []
+VFA_crepe = []
+VFA_yin = []
+VFA_yinFFT = []
+VR_level1 = []
+VR_level2 = []
+VR_level3 = []
+VR_crepe = []
+VR_yin = []
+VR_yinFFT = []
+RPA_level1 = []
+RPA_level2 = []
+RPA_level3 = []
+RPA_crepe = []
+RPA_yin = []
+RPA_yinFFT = []
+RCA_level1 = []
+RCA_level2 = []
+RCA_level3 = []
+RCA_crepe = []
+RCA_yin = []
+RCA_yinFFT = []
+OA_level1 = []
+OA_level2 = []
+OA_level3 = []
+OA_crepe = []
+OA_yin = []
+OA_yinFFT = []
 for folder in os.listdir('./RESULTS'):
     print('Analysing '+folder+' results ...')
     path = './RESULTS/'+folder
     os.mkdir(path+'/metrics')
     level = folder[0:6]
+    algor = folder[11:15]
     
     voicing_recall = []
     voicing_false_alarm = []
@@ -95,6 +126,51 @@ for folder in os.listdir('./RESULTS'):
     print("----- mean: ", np.mean(overall_accuracy))
     print("")
     
+    # Save stats
+    if int(level[-1])==1:
+        for i in range(len(overall_accuracy)):
+            RCA_level1.append(raw_chroma_accuracy[i])
+            RPA_level1.append(raw_pitch_accuracy[i])
+            OA_level1.append(overall_accuracy[i])
+            VFA_level1.append(voicing_false_alarm[i])
+            VR_level1.append(voicing_recall[i])
+    elif int(level[-1])==2:
+        for i in range(len(overall_accuracy)):
+            RCA_level2.append(raw_chroma_accuracy[i])
+            RPA_level2.append(raw_pitch_accuracy[i])
+            OA_level2.append(overall_accuracy[i])
+            VFA_level2.append(voicing_false_alarm[i])
+            VR_level2.append(voicing_recall[i])
+    else:
+        for i in range(len(overall_accuracy)):
+            RCA_level3.append(raw_chroma_accuracy[i])
+            RPA_level3.append(raw_pitch_accuracy[i])
+            OA_level3.append(overall_accuracy[i])
+            VFA_level3.append(voicing_false_alarm[i])
+            VR_level3.append(voicing_recall[i])
+    
+    if algor=='CREP':
+        for i in range(len(overall_accuracy)):
+            RCA_crepe.append(raw_chroma_accuracy[i])
+            RPA_crepe.append(raw_pitch_accuracy[i])
+            OA_crepe.append(overall_accuracy[i])
+            VFA_crepe.append(voicing_false_alarm[i])
+            VR_crepe.append(voicing_recall[i])
+    elif algor=='YinF':
+        for i in range(len(overall_accuracy)):
+            RCA_yinFFT.append(raw_chroma_accuracy[i])
+            RPA_yinFFT.append(raw_pitch_accuracy[i])
+            OA_yinFFT.append(overall_accuracy[i])
+            VFA_yinFFT.append(voicing_false_alarm[i])
+            VR_yinFFT.append(voicing_recall[i])
+    else:
+        for i in range(len(overall_accuracy)):
+            RCA_yin.append(raw_chroma_accuracy[i])
+            RPA_yin.append(raw_pitch_accuracy[i])
+            OA_yin.append(overall_accuracy[i])
+            VFA_yin.append(voicing_false_alarm[i])
+            VR_yin.append(voicing_recall[i])
+    
     # Plots
     array = np.arange(1,len(voicing_recall)+1)
     
@@ -107,5 +183,99 @@ for folder in os.listdir('./RESULTS'):
     plt.savefig(path+'/metrics/metrics_results.png')
     plt.clf()
 
-        
+print("Saving metrics boxplots ...")
+print(VR_yin)
+print(VR_yinFFT)
+print(VFA_yin)
+print(VFA_yinFFT)
+print(OA_yin)
+print(OA_yinFFT)
+print(RCA_yin)
+print(RCA_yinFFT)
+print(RPA_yin)
+print(RPA_yinFFT)
+print(VR_level1)
+print(VR_level2)
+print(VFA_level1)
+print(VFA_level2)
+print(OA_level1)
+print(OA_level2)
+print(RCA_level1)
+print(RCA_level2)
+print(RPA_level1)
+print(RPA_level2)
+shutil.rmtree('./boxplots')
+os.mkdir('./boxplots')
+###### level boxplots
+# VR
+fig = plt.figure()
+fig.suptitle('VR', fontsize=14, fontweight='bold')
+box_plot_data=[VR_level1,VR_level2,VR_level3]
+plt.boxplot(box_plot_data, labels=['level1','level2','level3'])
+plt.savefig('./boxplots/VR_levels.png')
+
+# VFA
+fig = plt.figure()
+fig.suptitle('VFA', fontsize=14, fontweight='bold')
+box_plot_data=[VFA_level1,VFA_level2,VFA_level3]
+plt.boxplot(box_plot_data, labels=['level1','level2','level3'])
+plt.savefig('./boxplots/VFA_levels.png')
+
+# RPA
+fig = plt.figure()
+fig.suptitle('RPA', fontsize=14, fontweight='bold')
+box_plot_data=[RPA_level1,RPA_level2,RPA_level3]
+plt.boxplot(box_plot_data, labels=['level1','level2','level3'])
+plt.savefig('./boxplots/RPA_levels.png')
+
+# RCA
+fig = plt.figure()
+fig.suptitle('RCA', fontsize=14, fontweight='bold')
+box_plot_data=[RCA_level1,RCA_level2,RCA_level3]
+plt.boxplot(box_plot_data, labels=['level1','level2','level3'])
+plt.savefig('./boxplots/RCA_levels.png')
+
+# OA
+fig = plt.figure()
+fig.suptitle('OA', fontsize=14, fontweight='bold')
+box_plot_data=[OA_level1,OA_level2,OA_level3]
+plt.boxplot(box_plot_data, labels=['level1','level2','level3'])
+plt.savefig('./boxplots/OA_levels.png')
+
+
+###### algorithm boxplots
+# VR
+fig = plt.figure()
+fig.suptitle('VR', fontsize=14, fontweight='bold')
+box_plot_data=[VR_yin,VR_yinFFT,VR_crepe]
+plt.boxplot(box_plot_data, labels=['yin','yinFFT','CREPE'])
+plt.savefig('./boxplots/VR_algorithms.png')
+
+# VFA
+fig = plt.figure()
+fig.suptitle('VFA', fontsize=14, fontweight='bold')
+box_plot_data=[VFA_yin,VFA_yinFFT,VFA_crepe]
+plt.boxplot(box_plot_data, labels=['yin','yinFFT','CREPE'])
+plt.savefig('./boxplots/VFA_algorithms.png')
+
+# RPA
+fig = plt.figure()
+fig.suptitle('RPA', fontsize=14, fontweight='bold')
+box_plot_data=[RPA_yin,RPA_yinFFT,RPA_crepe]
+plt.boxplot(box_plot_data, labels=['yin','yinFFT','CREPE'])
+plt.savefig('./boxplots/RPA_algorithms.png')
+
+# RCA
+fig = plt.figure()
+fig.suptitle('RCA', fontsize=14, fontweight='bold')
+box_plot_data=[RCA_yin,RCA_yinFFT,RCA_crepe]
+plt.boxplot(box_plot_data, labels=['yin','yinFFT','CREPE'])
+plt.savefig('./boxplots/RCA_algorithms.png')
+
+# OA
+fig = plt.figure()
+fig.suptitle('OA', fontsize=14, fontweight='bold')
+box_plot_data=[OA_yin,OA_yinFFT,OA_crepe]
+plt.boxplot(box_plot_data, labels=['yin','yinFFT','CREPE'])
+plt.savefig('./boxplots/OA_algorithms.png')        
 
